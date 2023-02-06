@@ -6,7 +6,7 @@
 #    By: abittel <abittel@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/22 22:59:14 by rahmed            #+#    #+#              #
-#    Updated: 2023/01/31 00:06:34 by abittel          ###   ########.fr        #
+#    Updated: 2023/02/03 16:35:06 by abittel          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,24 +22,15 @@ ASM				= 	as
 
 UNAME_S			:=	$(shell uname -s)
 
-ifeq ($(UNAME_S),Darwin) #FOR MAC
-CFLAGS			=	-fPIC -g 
-SRCS			=	${SRC_DIR}/ft_tree/ft_treeadd_f.c\
-					${SRC_DIR}/ft_tree/ft_treenew.c\
-					${SRC_DIR}/ft_tree/ft_prof.c
-endif
-
-ifeq ($(UNAME_S),Linux) #FOR LINUX
 CFLAGS			=	-g 
 PARSER_FILE		=	${SRC_DIR}/parser.y
 LEXER_FILE		=	${SRC_DIR}/lexer.l
 SRCS			=	${SRC_DIR}/ft_tree/ft_treeadd_f.c\
 					${SRC_DIR}/ft_tree/ft_treenew.c\
 					${SRC_DIR}/ft_tree/ft_treeprof.c\
-					${SRC_DIR}/ast.c
-PARSER_GEN_FILE	= 	./y.tab.c
-OPARSER_GEN_FILE	= ${PARSER_GEN_FILE:.c=.o}
-endif
+					${SRC_DIR}/ast.c\
+					${SRC_DIR}/symbol_table.c
+PARSER			= 	./y.tab.c
 
 ifeq ($(HOSTTYPE),)
 	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
@@ -49,20 +40,21 @@ NAME			=	compiler
 
 HEADER		=	-I${INC_DIR} -I${INC_DIR}/ft_tree -I./
 LDFLAGS		=	-L${SRC_DIR}
-FSFLAGS		=	-fsanitize=address
+FSFLAGS		=	#-fsanitize=address
 
-OBJS			=	${SRCS:.c=.o}
+OBJS				=	${SRCS:.c=.o}
+OPARSER_GEN_FILE	=	${PARSER:.c=.o}
 %.o				:	%.c
 					@echo "${TXT_BLUE}"
 					@echo "~~~~~~~ MAKE PROJECT ~~~~~~~~"
-					${CC} -c ${CFLAGS} -o $@ $< ${HEADER} 
+					${CC} -c ${CFLAGS} ${FSFLAGS} -o $@ $< ${HEADER} 
 					@echo "${FANCY_RESET}"
 
 ${NAME}			:	lexer parser ${OPARSER_GEN_FILE} ${OBJS}
 					@echo "${TXT_YELLOW}"
 					@echo "~~~~~~~ COMPILATION ~~~~~~~~~"
 					@echo "${TXT_GREEN}"
-					${CC} ${LDFLAGS} ${CFLAGS} -o ${NAME} ${OBJS} ${OPARSER_GEN_FILE}
+					${CC} ${LDFLAGS} ${CFLAGS} ${FSFLAGS} -o ${NAME} ${OBJS} ${OPARSER_GEN_FILE}
 					@echo "${FANCY_RESET}"
 
 all			:	${NAME} 

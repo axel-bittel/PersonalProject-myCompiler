@@ -1,45 +1,16 @@
-function asd (int id) 
-{
-	int abc;
-	abc = id + 1;	
-	left = (10 + 1) / 15 - yesy;	
-	if (yesy == 1)
+function test(int a) {
+	a = a / 2;
+	if (a > 34)
 	{
-		1 + 1;
+		return (54);
 	}
 	else
 	{
-		12 + sdfsd;
-		hello + 1232;
+		1 + 1;
 	}
 }
 
-function bert (int fg)
+function main()
 {
-	if (q == 456)
-	{
-		if (qwe <= 56)
-		{
-			id = 34;
-		}
-		else
-		{
-			1 + 1;
-		}
-	}
-}
-
-function bert2 (int fg)
-{
-	if (q == 455)
-	{
-		if (qwe <= 56)
-		{
-			id = 34;
-		}
-		else
-		{
-			1 + 1;
-		}
-	}
+	test(a);
 }

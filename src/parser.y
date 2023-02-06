@@ -9,14 +9,16 @@
 %union {
 	int		val;
 	char	*name;
+	char	*type;
 	char	op;
-	void*tree;
+	void	*tree;
 };
-%token FUNCTION TYPE RETURN END_INST
+%token FUNCTION RETURN END_INST
 %token IF ELSE_IF ELSE WHILE
 %token BOOL_EQ BOOL_LEQ BOOL_GEQ BOOL_L BOOL_G
 %token BRACKET_LEFT BRACKET_RIGHT ACCOLADE_LEFT ACCOLADE_RIGHT 
 %token <name> IDENTIFIER
+%token <type> TYPE
 %token <val> INTEGER
 %token <op> OP_EQ OP_ADD OP_MINUS OP_MULT OP_DIV
 %type  <tree> expr end_cond inter_cond inst_lst dec boucle cond arg arg_lst prog funct all
@@ -26,7 +28,7 @@
 %start all
 %%
 all 		:	prog all			{	data.ast = $1;	}
-			|
+			|						{}
 			;
 prog		:	funct prog		{	$$ = create_parent_tree($2, $1, INSTRUCTION_NODE, 		0);	}
 			|	dec	  prog		{	$$ = create_parent_tree($2, $1, INSTRUCTION_NODE, 		0);	}
@@ -36,12 +38,20 @@ funct		: FUNCTION IDENTIFIER BRACKET_LEFT arg_lst BRACKET_RIGHT ACCOLADE_LEFT in
 					$$ = create_parent_tree($7, $4, FUNCTION_NODE, 0);
 				}
 			;
-arg_lst 	: arg 											{	$$ = create_parent_tree(0, $1, ARG_NODE, 0); }
-			| arg ',' arg_lst 								{	$$ = create_parent_tree($3, $1, ARG_NODE, 0); }
+arg_lst 	: arg 											{	$$ = create_parent_tree(0, $1, ARG_LIST_NODE, 0); }
+			| arg ',' arg_lst 								{	$$ = create_parent_tree($3, $1, ARG_LIST_NODE, 0); }
 			|												{	$$ = 0;	}
 			;
 arg 		: TYPE IDENTIFIER 	{ 
-					$$ = create_parent_tree(0, 0, ARG_NODE, 0);
+					t_symbol_table_elem *symbol = new_elem_table($1, TYPE_ARG, 0, 0, 0);
+					char	*inter = $1;
+					if (!strcmp(inter, "int"))
+						symbol->type = TYPE_INT;
+					else if (!strcmp(inter, "bool"))
+						symbol->type = TYPE_BOOL;
+					else if (!strcmp(inter, "float"))
+						symbol->type = TYPE_FLOAT;
+					$$ = create_parent_tree(0, 0, ARG_NODE, symbol);
 				}
 			;
 inst_lst	: cond inst_lst {
@@ -65,10 +75,18 @@ inst_lst	: cond inst_lst {
 			|	{	$$ = 0;}
 			;
 dec			: TYPE IDENTIFIER		{
+					t_symbol_table_elem *symbol = new_elem_table($1, TYPE_VAR, 0, 0, 0);
+					char	*inter = $1;
+					if (!strcmp(inter, "int"))
+						symbol->type = TYPE_INT;
+					else if (!strcmp(inter, "bool"))
+						symbol->type = TYPE_BOOL;
+					else if (!strcmp(inter, "float"))
+						symbol->type = TYPE_FLOAT;
 					$$ = create_parent_tree(0, 0, LET_ID_NODE, $2);
 				}
 			| IDENTIFIER '=' expr {
-					$$ = create_parent_tree( create_parent_tree(0, 0, ID_NODE, $1) , $3, EQ_NODE, 		0);
+				$$ = create_parent_tree( create_parent_tree(0, 0, ID_NODE, $1) , $3, EQ_NODE, 		0);
 			}
 			;
 boucle		: WHILE BRACKET_LEFT expr BRACKET_RIGHT ACCOLADE_LEFT inst_lst ACCOLADE_RIGHT {
@@ -130,5 +148,6 @@ int main()
         yydebug = 1;
     #endif
 	yyparse();
+	data.table = generate_new_table(data.ast);
 	print_tree(data.ast, 0);
 }

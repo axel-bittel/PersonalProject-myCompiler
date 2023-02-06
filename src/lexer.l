@@ -14,6 +14,7 @@ function {
 	return FUNCTION;
 }
 int {
+  yylval.type = strdup("int");
   return TYPE;
 }
 return {
