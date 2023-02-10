@@ -53,24 +53,62 @@ static int	rec_generate_new_table(t_tree *tree, t_symbol_table *table)
 		if (tree->f_b)
 			rec_generate_new_table(tree->f_b, table);
 		if (tree->f_a)
-			rec_generate_new_table(tree->f_b, table);	
+			rec_generate_new_table(tree->f_a, table);	
 	}
 	else if (node->type == ARG_LIST_NODE)
 	{
-		if (tree->f_b)
+		if (tree->f_b && ((t_node*)tree->f_b->content)->type == ARG_NODE)
 		{
-			elem = tree->f_b->content;
+			elem = ((t_node*)tree->f_b->content)->datas;
 			add_element_in_table(table, elem);
 		}
 		if (tree->f_a)
-			rec_generate_new_table(tree->f_b, table);	
+			rec_generate_new_table(tree->f_a, table);	
 	}
 	else if (node->type == LET_ID_NODE)
 	{
 		elem = new_elem_table(node->datas, TYPE_VAR, TYPE_PTR, 0, 0);
 		add_element_in_table(table, elem);
 	}
+	else
+	{
+		if (tree->f_b)
+			rec_generate_new_table(tree->f_b, table);
+		if (tree->f_a)
+			rec_generate_new_table(tree->f_a, table);
+	}
 	return (1);
+}
+
+int	get_sizeof(char	type)
+{
+	if (type == TYPE_INT)
+		return sizeof(int);
+	if (type == TYPE_PTR)
+		return sizeof(void*);
+}
+
+void	add_offset(t_symbol_table *table)
+{
+	t_symbol_table_elem	*fun = 0;
+	t_symbol_table_elem	*elem = 0;
+	int	offset;
+
+	offset = 0;
+	elem = table->begin;
+	while (elem)
+	{
+		if (elem->type_symbol == TYPE_FUNCTION)
+		{
+			if (fun)
+				fun->offset = offset;
+			offset = 0;
+			fun = elem;
+		}
+		offset += get_sizeof(elem->type);
+		elem->offset = offset;
+		elem = elem->next;
+	}
 }
 
 t_symbol_table	*generate_new_table(t_tree *tree)
@@ -79,5 +117,7 @@ t_symbol_table	*generate_new_table(t_tree *tree)
 
 	table = new_table();
 	rec_generate_new_table(tree, table);
+	//Add some datas to table
+	add_offset(table);
 	return (table);
 }	

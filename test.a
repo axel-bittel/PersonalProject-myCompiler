@@ -1,5 +1,7 @@
-function test(int a) {
+function main(int a) {
+	int	b;
 	a = a / 2;
+	a * 2 / 3 + 45;
 	if (a > 34)
 	{
 		return (54);
@@ -8,9 +10,10 @@ function test(int a) {
 	{
 		1 + 1;
 	}
+	test(a);
 }
 
-function main()
+function test(int b)
 {
-	test(a);
+	1 + 1;
 }

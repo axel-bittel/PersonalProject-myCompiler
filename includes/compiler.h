@@ -11,6 +11,8 @@
 #define IF_NODE 			0	//NODE FOR IF
 #define ELSEIF_NODE     	1	//NODE FOR ELSE IF
 #define ELSE_NODE		    2	//NODE FOR ELSE
+#define RETURN_NODE			23	//NODE FOR RETURN OF FUNCTION
+#define CALL_NODE			24	//NODE CALL FUNCTION
 
 #define ADD_NODE			4	//NODE FOR ADDITION
 #define MINUS_NODE	    	5	//NODE FOR SUBSTRACTION
@@ -33,8 +35,9 @@
 #define	ID_NODE				18	//NODE FOR ID (VAR)
 #define	LET_ID_NODE			20	//NODE FOR DECLARATION OF ID (VAR)
 
-#define ARG_NODE				21	//NODE FOR ARGUMENT OF FUNCTION
-#define ARG_LIST_NODE			22	//NODE FOR LIST OF ARGUMENT OF FUNCTION
+#define ARG_NODE			21	//NODE FOR ARGUMENT OF FUNCTION
+#define ARG_LIST_NODE		22	//NODE FOR LIST OF ARGUMENT OF FUNCTION
+#define ARG_CALL_LIST_NODE	25	//NODE FOR LIST OF ARGUMENT OF FUNCTION
 
 //AST
 typedef struct	s_node
@@ -64,7 +67,7 @@ typedef	struct	s_symbol_table_elem
 	char	type;
 	short 	nb_args;
 	int		line_declaration;
-	unsigned long	long int	value;
+	unsigned long	long int	offset;
 	struct s_symbol_table_elem*	next;
 }				t_symbol_table_elem;
 
@@ -79,10 +82,12 @@ typedef	struct	s_data
 {
 	t_symbol_table	*table;
 	t_tree			*ast;	
+	char			is_main;
 }				t_data;
 
 int	add_element_in_table(t_symbol_table *table, t_symbol_table_elem *elem);
 t_symbol_table	*new_elem_table(char	*name, char	type_symbol, char	type, short nb_args, int line_declaration);
 t_symbol_table	*new_table();
 t_symbol_table	*generate_new_table(t_tree *tree);
+void			asm_generator(t_data	*data);	
 #endif

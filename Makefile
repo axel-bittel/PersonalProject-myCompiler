@@ -6,7 +6,7 @@
 #    By: abittel <abittel@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/22 22:59:14 by rahmed            #+#    #+#              #
-#    Updated: 2023/02/03 16:35:06 by abittel          ###   ########.fr        #
+#    Updated: 2023/02/10 08:55:57 by abittel          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,8 @@ SRCS			=	${SRC_DIR}/ft_tree/ft_treeadd_f.c\
 					${SRC_DIR}/ft_tree/ft_treenew.c\
 					${SRC_DIR}/ft_tree/ft_treeprof.c\
 					${SRC_DIR}/ast.c\
-					${SRC_DIR}/symbol_table.c
+					${SRC_DIR}/symbol_table.c\
+					${SRC_DIR}/asm_generator.c
 PARSER			= 	./y.tab.c
 
 ifeq ($(HOSTTYPE),)
